@@ -79,18 +79,18 @@ namespace Online_Shop.Services
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
             string token = GenerateToken(authClaims);
-            return (1, token);
+            return (1, $"Bearer {token}");
         }
 
 
         private string GenerateToken(IEnumerable<Claim> claims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Issuer = _configuration["JWT:ValidIssuer"],
-                Audience = _configuration["JWT:ValidAudience"],
+                Issuer = _configuration["JWT:Issuer"],
+                Audience = _configuration["JWT:Audience"],
                 Expires = DateTime.UtcNow.AddHours(3),
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(claims)

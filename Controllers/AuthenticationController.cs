@@ -56,6 +56,7 @@ namespace Online_Shop.Controllers
                 {
                     return BadRequest(message);
                 }
+
                 return CreatedAtAction(nameof(Register), new {message = $"{model.Name} {message}"});
 
             }
