@@ -10,8 +10,8 @@ namespace Online_Shop.Contracts
 
         Task<Role?> CreateAsync(Role? role);
 
-        Task<Role?> DeleteAsync(int? roleId);
+        Task DeleteAsync(int? roleId);
 
-        Task<Role?> UpdateAsync(Role? role);
+        Task UpdateAsync(Role? role);
     }
 }

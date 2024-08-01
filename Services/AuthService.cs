@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Online_Shop.Contracts;
 using Online_Shop.Models;
@@ -14,19 +15,23 @@ namespace Online_Shop.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _context;
 
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ApplicationDbContext context)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
+            _context = context;
         }
 
         public async Task<(int, string)> Registeration(RegistrationModel model, string role)
         {
             role.ToLower();
             string userRole = GetRole(role);
+
+
 
             var userExists = await userManager.FindByNameAsync(model.Username);
 
@@ -41,7 +46,7 @@ namespace Online_Shop.Services
                 Name = model.Name
             };
 
-            if(userRole == "invalid")
+            if (userRole == "invalid")
             {
                 return (0, "User role is invalid, please enter correct role");
             }
@@ -55,7 +60,7 @@ namespace Online_Shop.Services
 
             userManager.AddToRoleAsync(user, userRole);
 
-            return (1, "User created successfully! with role: "+userRole);
+            return (1, "User created successfully! with role: " + userRole);
         }
 
         public async Task<(int, string)> Login(LoginModel model)
@@ -108,6 +113,7 @@ namespace Online_Shop.Services
             _ => "invalid"
         };
 
+        
     }
 }
 

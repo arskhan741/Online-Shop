@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Online_Shop.Contracts;
 using Online_Shop.Models;
 
@@ -10,11 +11,13 @@ namespace Online_Shop.Controllers
     {
         private readonly IAuthService _authService;
         private readonly ILogger<AuthenticationController> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticationController(IAuthService authService, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IAuthService authService, ILogger<AuthenticationController> logger, RoleManager<IdentityRole> roleManager)
         {
             _authService = authService;
             _logger = logger;
+            _roleManager = roleManager;
         }
 
 
@@ -44,8 +47,11 @@ namespace Online_Shop.Controllers
         {
             try
             {
+               
+
                 if (!ModelState.IsValid)
                     return BadRequest("Invalid payload");
+
 
                 enteredRole.ToLower();
 
