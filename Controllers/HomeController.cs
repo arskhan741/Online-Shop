@@ -14,13 +14,6 @@ namespace Online_Shop.Controllers
             _logger = logger;
         }
 
-        [HttpGet("TestUser")]
-        [Authorize(Roles = "User")]
-        public IActionResult TestUser()
-        {
-            return Ok(new { message = "Test User API" });
-        }
-
         [HttpGet("Test Admin")]
         [Authorize(Roles = "Admin")]
         public IActionResult TestAdmin()
@@ -28,5 +21,27 @@ namespace Online_Shop.Controllers
             return Ok(new { message = "Test Admin API" });
         }
 
+
+        [HttpGet("TestManager")]
+        [Authorize(Roles = "Manager")]
+        public IActionResult TestManager()
+        {
+            return Ok(new { message = "Test Manager API" });
+        }
+
+        [HttpGet("TestMember")]
+        [Authorize(Roles = "Member")]
+        public IActionResult TestMember()
+        {
+            return Ok(new { message = "Test Member API" });
+        }
+
+        [HttpGet("TestUserPolicy")]
+        //[Authorize(Policy = "UserPolicy")]
+        [Authorize(Roles = "User")]
+        public IActionResult TestUserPolicy()
+        {
+            return Ok(new { message = "Test User Policy API" });
+        }
     }
 }

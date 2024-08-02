@@ -16,7 +16,6 @@ namespace Online_Shop.Repository
             _context = context;
             _roleManager = roleManager; 
         }
-        //now assing available roles to user, dynamically from table
 
         public async Task<Role?> CreateAsync(Role? role)
         {

@@ -28,18 +28,20 @@ namespace Online_Shop.Services
             role.ToLower();
             //string userRole = GetRole(role);
 
+            //Get the roles from tables and check if it already exsists.
             IdentityRole? roleVar = await roleManager.FindByNameAsync(role);
 
-            if (roleVar == null)
-            {
-                return (0, "User role is invalid, please enter correct role");
-            }
 
+            if (roleVar == null)
+                return (0, "User role is invalid, please enter correct role");
+            
+            //Get the user from table and check if it already exsists.
             ApplicationUser? userExists = await userManager.FindByNameAsync(model.Username);
 
             if (userExists != null)
                 return (0, "User already exists");
 
+            //if not create a new one
             ApplicationUser user = new ApplicationUser()
             {
                 Email = model.Email,
@@ -50,9 +52,11 @@ namespace Online_Shop.Services
 
             var createUserResult = await userManager.CreateAsync(user, model.Password);
 
+            //Failed due to any reason.
             if (!createUserResult.Succeeded)
                 return (0, "User creation failed! Please check user details and try again.");
 
+            //IF user is created
             string roleName = (roleVar.Name != null) ? roleVar.Name.ToString() : string.Empty;
 
             await userManager.AddToRoleAsync(user, roleName);
@@ -83,11 +87,11 @@ namespace Online_Shop.Services
         }
         private string GenerateToken(IEnumerable<Claim> claims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Issuer = _configuration["JWT:ValidIssuer"],
-                Audience = _configuration["JWT:ValidAudience"],
+                Issuer = _configuration["JWT:Issuer"],
+                Audience = _configuration["JWT:Audience"],
                 Expires = DateTime.UtcNow.AddHours(3),
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(claims)

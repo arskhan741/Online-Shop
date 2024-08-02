@@ -47,8 +47,6 @@ namespace Online_Shop.Controllers
         {
             try
             {
-               
-
                 if (!ModelState.IsValid)
                     return BadRequest("Invalid payload");
 

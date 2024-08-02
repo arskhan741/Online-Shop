@@ -51,8 +51,19 @@ public class Program
             };
         });
 
-        // Add services to the container.
-        builder.Services.AddTransient<IAuthService, AuthService>();
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.AddPolicy("UserPolicy", 
+        //        policy => policy.RequireRole("User")
+        //                        .RequireRole("Member")
+        //                        .RequireRole("Manager")
+        //                        .RequireRole("Admin")
+        //        );
+        //});
+
+
+       // Add services to the container.
+       builder.Services.AddTransient<IAuthService, AuthService>();
         builder.Services.AddTransient<IRoleService, RoleRepository>();
         builder.Services.AddAutoMapper(typeof(MapperConfig));
 
