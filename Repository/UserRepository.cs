@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Online_Shop.Contracts;
 using Online_Shop.Models;
@@ -8,22 +7,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Online_Shop.Services
+namespace Online_Shop.Repository
 {
-    public class AuthService : IAuthService
+    public class UserRepository : IUserRepository
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public UserRepository(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
         }
 
-        public async Task<(int, string)> Registeration(RegistrationModel model, string role)
+        public async Task<(int, string)> CreateUser(RegistrationModel model, string role)
         {
             role.ToLower();
             //string userRole = GetRole(role);
@@ -34,7 +33,7 @@ namespace Online_Shop.Services
 
             if (roleVar == null)
                 return (0, "User role is invalid, please enter correct role");
-            
+
             //Get the user from table and check if it already exsists.
             ApplicationUser? userExists = await userManager.FindByNameAsync(model.Username);
 
@@ -57,13 +56,43 @@ namespace Online_Shop.Services
                 return (0, "User creation failed! Please check user details and try again.");
 
             //IF user is created
-            string roleName = (roleVar.Name != null) ? roleVar.Name.ToString() : string.Empty;
+            string roleName = roleVar.Name != null ? roleVar.Name.ToString() : string.Empty;
 
             await userManager.AddToRoleAsync(user, roleName);
 
             return (1, "User created successfully! with role: " + roleVar.Name);
         }
 
+        public async Task<(int, string)> DeleteUser(string userEmail)
+        {
+            ApplicationUser? user = await userManager.FindByEmailAsync(userEmail);
+
+            if (user == null)
+                return (0, $"User with email {userEmail} not found");
+
+            await userManager.DeleteAsync(user);
+
+            return (1, $"User with email {userEmail} is Deleted");
+        }
+
+        public async Task<List<ApplicationUser>> GetAllUser()
+        {
+            var allUsers = await userManager.Users.ToListAsync();
+
+            if (allUsers == null)
+                throw new NullReferenceException($"users not found");
+
+            return allUsers;
+        }
+
+        public async Task<ApplicationUser> GetUser(string userEmail)
+        {
+            ApplicationUser? userById = await userManager.FindByEmailAsync(userEmail);
+
+            if (userById == null) throw new NullReferenceException($"user not found with email: {userEmail}");
+
+            return userById;
+        }
 
         public async Task<(int, string)> Login(LoginModel model)
         {
@@ -85,6 +114,56 @@ namespace Online_Shop.Services
             string token = GenerateToken(authClaims);
             return (1, token);
         }
+
+        public async Task<(int, string)> UpdateUser(RegistrationModel model, string newPassword)
+        {
+            ApplicationUser? exsistingUser = await userManager.FindByEmailAsync(model.Email);
+
+            if (exsistingUser == null)
+                return (0, $"User does not exsists with name {model.Email}");
+
+            string correctPasswordHash = string.Empty;
+
+            if (exsistingUser.PasswordHash is not null)
+                correctPasswordHash = exsistingUser.PasswordHash;
+            else
+                return (0, $"Password hash for {model.Email} not found");
+
+
+            // Create an instance of PasswordHasher
+            var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+            // Verify the entered password against the stored hash
+            var passwordVerificationResult = passwordHasher.VerifyHashedPassword(exsistingUser, correctPasswordHash, model.Password);
+
+            if (passwordVerificationResult == PasswordVerificationResult.Failed)
+            {
+                return (0, "Incorrect password entered for " + model.Email);
+            }
+
+            exsistingUser.UserName = model.Username;
+            exsistingUser.Name = model.Name;
+
+            try
+            {
+                await userManager.UpdateAsync(exsistingUser);
+
+                // Change the password
+                var changePasswordResult = await userManager.ChangePasswordAsync(exsistingUser, model.Password, newPassword);
+
+                if (!changePasswordResult.Succeeded)
+                {
+                    return (0, "Password change failed: " + string.Join(", ", changePasswordResult.Errors.Select(e => e.Description)));
+                }
+
+                return (1, $"User successfully Updated ! with email: {model.Email} ");
+            }
+            catch (Exception ex)
+            {
+                return (0, "User updation failed " + ex);
+            }
+        }
+
         private string GenerateToken(IEnumerable<Claim> claims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));

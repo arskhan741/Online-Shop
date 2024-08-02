@@ -72,7 +72,7 @@ namespace Online_Shop.Controllers
         }
 
 
-        [HttpGet("Get All Roles")]
+        [HttpGet("GetAllRoles")]
         public async Task<ActionResult<List<GetRoleDetails>>> GetAllRoles()
         {
             var roles = await _roleService.GetAllAsnyc();
