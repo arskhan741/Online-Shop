@@ -112,7 +112,8 @@ namespace Online_Shop.Repository
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
             string token = GenerateToken(authClaims);
-            return (1, token);
+
+            return (1, $"Bearer {token}");
         }
 
         public async Task<(int, string)> UpdateUser(RegistrationModel model, string newPassword)

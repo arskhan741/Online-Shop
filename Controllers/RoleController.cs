@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Online_Shop.Contracts;
-using Online_Shop.DTOs;
+using Online_Shop.DTOs.RoleDTOs;
 using Online_Shop.Models;
 
 namespace Online_Shop.Controllers

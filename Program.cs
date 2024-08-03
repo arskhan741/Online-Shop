@@ -7,6 +7,7 @@ using Online_Shop.Configurations;
 using Online_Shop.Contracts;
 using Online_Shop.Models;
 using Online_Shop.Repository;
+using System.Security.Claims;
 using System.Text;
 
 
@@ -50,20 +51,23 @@ public class Program
             };
         });
 
-        //builder.Services.AddAuthorization(options =>
-        //{
-        //    options.AddPolicy("UserPolicy", 
-        //        policy => policy.RequireRole("User")
-        //                        .RequireRole("Member")
-        //                        .RequireRole("Manager")
-        //                        .RequireRole("Admin")
-        //        );
-        //});
+        //Adding policy to authorization
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("ManagerPolicy", policy => policy.RequireRole("Admin", "Manager"));
+            options.AddPolicy("MemberPolicy", policy => policy.RequireRole("Admin", "Manager", "Member"));
+            options.AddPolicy("UserPolicy", policy => policy.RequireRole("Admin", "Manager", "Member", "User"));
+            options.AddPolicy("Over21", policy => policy.RequireAssertion(context =>
+            context.User.HasClaim(c =>
+            c.Type == ClaimTypes.DateOfBirth && DateTime.Parse(c.Value) <= DateTime.Today.AddYears(-21))));
+        });
 
 
-       // Add services to the container.
-       builder.Services.AddTransient<IUserRepository, UserRepository>();
+        // Add services to the container.
+        builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<IRoleService, RoleRepository>();
+        builder.Services.AddTransient<ICategoryRepository, CategoryReposityory>();
         builder.Services.AddAutoMapper(typeof(MapperConfig));
 
         builder.Services.AddControllers();

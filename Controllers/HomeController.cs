@@ -14,31 +14,58 @@ namespace Online_Shop.Controllers
             _logger = logger;
         }
 
-        [HttpGet("Test Admin")]
+        [HttpGet("TestAdminRole")]
         [Authorize(Roles = "Admin")]
-        public IActionResult TestAdmin()
+        public IActionResult TestAdminRole()
         {
             return Ok(new { message = "Test Admin API" });
         }
 
 
-        [HttpGet("TestManager")]
+        [HttpGet("TestManagerRole")]
         [Authorize(Roles = "Manager")]
-        public IActionResult TestManager()
+        public IActionResult TestManagerRole()
         {
             return Ok(new { message = "Test Manager API" });
         }
 
-        [HttpGet("TestMember")]
+        [HttpGet("TestMemberRole")]
         [Authorize(Roles = "Member")]
-        public IActionResult TestMember()
+        public IActionResult TestMemberRole()
         {
             return Ok(new { message = "Test Member API" });
         }
 
-        [HttpGet("TestUserPolicy")]
-        //[Authorize(Policy = "UserPolicy")]
+        [HttpGet("TestUserRole")]
         [Authorize(Roles = "User")]
+        public IActionResult TestUserRole()
+        {
+            return Ok(new { message = "Test User Policy API" });
+        }
+
+        [HttpGet("TestAdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
+        public IActionResult TestAdminPolicy()
+        {
+            return Ok(new { message = "Test Admin Policy API" });
+        }
+
+        [HttpGet("TestManagerPolicy")]
+        [Authorize(Policy = "ManagerPolicy")]
+        public IActionResult TestManagerPolicy()
+        {
+            return Ok(new { message = "Test Manager Policy API" });
+        }
+
+        [HttpGet("TestMemberPolicy")]
+        [Authorize(Policy = "MemberPolicy")]
+        public IActionResult TestMemberPolicy()
+        {
+            return Ok(new { message = "Test Member Policy API" });
+        }
+
+        [HttpGet("TestUserPolicy")]
+        [Authorize(Policy = "UserPolicy")]
         public IActionResult TestUserPolicy()
         {
             return Ok(new { message = "Test User Policy API" });

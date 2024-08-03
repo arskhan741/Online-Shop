@@ -18,6 +18,7 @@ namespace Online_Shop.Models
         }
 
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
     }
 }

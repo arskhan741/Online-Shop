@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Online_Shop.DTOs
+namespace Online_Shop.DTOs.RoleDTOs
 {
-    public class CreateRoleDTO
+    public class UpdateRoleDTO
     {
+        [Required]
+        public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]

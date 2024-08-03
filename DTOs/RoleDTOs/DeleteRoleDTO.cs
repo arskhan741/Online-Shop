@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Online_Shop.DTOs
+namespace Online_Shop.DTOs.RoleDTOs
 {
     public class DeleteRoleDTO
     {
