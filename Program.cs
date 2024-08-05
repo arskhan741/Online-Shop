@@ -10,14 +10,12 @@ using Online_Shop.Repository;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
-
+using Newtonsoft.Json.Converters;
 
 public class Program
 {
     public static async Task Main(string[] args)
     {
-
-
         var builder = WebApplication.CreateBuilder(args);
 
         //For DB connection
@@ -59,29 +57,35 @@ public class Program
             options.AddPolicy("ManagerPolicy", policy => policy.RequireRole("Admin", "Manager"));
             options.AddPolicy("MemberPolicy", policy => policy.RequireRole("Admin", "Manager", "Member"));
             options.AddPolicy("UserPolicy", policy => policy.RequireRole("Admin", "Manager", "Member", "User"));
+            options.AddPolicy("ClaimsTest1", policy => policy.RequireClaim("Claim1", "Value1"));
             options.AddPolicy("Over21", policy => policy.RequireAssertion(context =>
-            context.User.HasClaim(c =>
-            c.Type == ClaimTypes.DateOfBirth && DateTime.Parse(c.Value) <= DateTime.Today.AddYears(-21))));
+                context.User.HasClaim(c =>
+                c.Type == ClaimTypes.DateOfBirth && DateTime.Parse(c.Value) <= DateTime.Today.AddYears(-21))));
         });
-
 
         // Add services to the container.
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<IRoleService, RoleRepository>();
         builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
         builder.Services.AddTransient<IProductRepository, ProductRepository>();
+
         builder.Services.AddAutoMapper(typeof(MapperConfig));
 
-        builder.Services.AddControllers().AddJsonOptions(x => 
-        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+        // Add MemoryCache service
+        builder.Services.AddMemoryCache();
 
+        builder.Services.AddControllers().AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        });
 
-        //Register for swagger Controller
+        // Register for swagger Controller
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-            //Add Security Defination
+            // Add Security Definition
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
@@ -90,27 +94,28 @@ public class Program
                 Type = SecuritySchemeType.ApiKey
             });
 
-            //Add Security Requirment
+            // Add Security Requirement
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
             {
-                new OpenApiSecurityScheme
                 {
-                    Reference = new OpenApiReference
+                    new OpenApiSecurityScheme
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<String>()
-            }
-                });
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+
+            // Add this line to support enums as strings in Swagger
+            c.UseAllOfToExtendReferenceSchemas();
         });
 
-
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        // Enable support for Newtonsoft.Json in Swashbuckle
+        builder.Services.AddSwaggerGenNewtonsoftSupport();
 
         var app = builder.Build();
 
@@ -126,14 +131,12 @@ public class Program
             }
         }
 
-
-
-
         // Configure the HTTP request pipeline.
+        // Middleware
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
         }
 
         app.UseHttpsRedirection();
@@ -145,6 +148,5 @@ public class Program
         app.MapControllers();
 
         app.Run();
-
     }
 }

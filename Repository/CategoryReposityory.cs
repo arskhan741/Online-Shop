@@ -47,6 +47,8 @@ namespace Online_Shop.Repository
 
         public async Task<IEnumerable<GetCategoryDetailsDto>> GetAllAsync()
         {
+            //Use when needed, lazy loading, can cause some performance issues.
+
             var categories = await _context.Categories
                                            .Include(c => c.Products)
                                            .ToListAsync();

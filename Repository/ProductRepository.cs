@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Online_Shop.Contracts;
 using Online_Shop.DTOs.ProductDTOs;
 using Online_Shop.Models;
@@ -10,11 +11,15 @@ namespace Online_Shop.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public ProductRepository(ApplicationDbContext context, IMapper mapper)
+        private readonly string _cacheKey = "productsCacheKey";
+
+        public ProductRepository(ApplicationDbContext context, IMapper mapper, IMemoryCache cache)
         {
             _context = context;
             _mapper = mapper;
+            _cache = cache;
         }
 
         public async Task<Product?> CreateAsync(CreateProductDTO createProductDTO)
@@ -24,6 +29,8 @@ namespace Online_Shop.Repository
             await _context.AddAsync(product);
             await _context.SaveChangesAsync();
 
+            InvalidateCache();
+
             return product;
         }
 
@@ -32,6 +39,8 @@ namespace Online_Shop.Repository
             Product? product = null;
 
             product = await _context.Products.FindAsync(deleteProductDTO.ProductId);
+
+            InvalidateCache();
 
             if (product != null)
             {
@@ -46,6 +55,11 @@ namespace Online_Shop.Repository
 
         public async Task<List<GetProductDetailsDTO>> GetAllAsync()
         {
+            if (_cache.TryGetValue(_cacheKey, out List<GetProductDetailsDTO>? cachedProducts))
+            {
+                return cachedProducts!;
+            }
+
             List<Product> products = await _context.Products.Include(p => p.Category).ToListAsync();
 
             List<GetProductDetailsDTO> productDetailsList = _mapper.Map<List<GetProductDetailsDTO>>(products);
@@ -55,6 +69,14 @@ namespace Online_Shop.Repository
                 Category? category = await _context.Categories.FindAsync(productDetails.CategoryId);
                 productDetails.CategoryName = (category is null) ? throw new NullReferenceException($"invalid category") : category.Name;
             }
+
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(100), // Cache for 100 minutes
+                SlidingExpiration = TimeSpan.FromMinutes(100) // Expire if not accessed for 100 minutes
+            };
+
+            _cache.Set(_cacheKey, productDetailsList, cacheOptions);
 
             return productDetailsList;
         }
@@ -84,11 +106,20 @@ namespace Online_Shop.Repository
 
             product.Name = updateProductDTO.NewName;
             product.Description = updateProductDTO.NewDescription;
+            product.CategoryId = updateProductDTO.CategoryId;
+
+            //_mapper.Map(product, updateProductDTO);
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
 
+            InvalidateCache();
+
             return product;
         }
+
+        // Invalidate cache, on update add or delete
+        private void InvalidateCache() =>  _cache.Remove(_cacheKey);
+
     }
 }

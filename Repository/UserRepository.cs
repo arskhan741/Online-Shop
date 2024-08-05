@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Online_Shop.Contracts;
 using Online_Shop.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Text;
 
@@ -22,9 +23,9 @@ namespace Online_Shop.Repository
             _configuration = configuration;
         }
 
-        public async Task<(int, string)> CreateUser(RegistrationModel model, string role)
+        public async Task<(int, string)> CreateUser(RegistrationModel model, Roles selectedRole)
         {
-            role.ToLower();
+            string role = selectedRole.ToString().ToLower();
             //string userRole = GetRole(role);
 
             //Get the roles from tables and check if it already exsists.
@@ -51,6 +52,11 @@ namespace Online_Shop.Repository
 
             var createUserResult = await userManager.CreateAsync(user, model.Password);
 
+            // Add claims based on role
+            (string claimType, string claimValue) = GetClaimType_ClaimValue(selectedRole);
+            await userManager.AddClaimAsync(user, new Claim(claimType, claimValue));
+
+
             //Failed due to any reason.
             if (!createUserResult.Succeeded)
                 return (0, "User creation failed! Please check user details and try again.");
@@ -61,6 +67,41 @@ namespace Online_Shop.Repository
             await userManager.AddToRoleAsync(user, roleName);
 
             return (1, "User created successfully! with role: " + roleVar.Name);
+        }
+
+        public async Task<(int, string)> Login(LoginModel model)
+        {
+            var user = await userManager.FindByNameAsync(model.Username);
+
+            if (user == null)
+                return (0, "Invalid username");
+
+            if (!await userManager.CheckPasswordAsync(user, model.Password))
+                return (0, "Invalid password");
+
+            var userRoles = await userManager.GetRolesAsync(user);
+            var userClaims = await userManager.GetClaimsAsync(user); // Retrieve user claims
+
+
+            var authClaims = new List<Claim>
+            {
+               new Claim(ClaimTypes.Name, user.UserName),
+               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            foreach (var claim in userClaims) // Add user claims
+            {
+                authClaims.Add(claim);
+            }
+
+            string token = GenerateToken(authClaims);
+
+            return (1, $"Bearer {token}");
         }
 
         public async Task<(int, string)> DeleteUser(string userEmail)
@@ -75,16 +116,6 @@ namespace Online_Shop.Repository
             return (1, $"User with email {userEmail} is Deleted");
         }
 
-        public async Task<List<ApplicationUser>> GetAllUser()
-        {
-            var allUsers = await userManager.Users.ToListAsync();
-
-            if (allUsers == null)
-                throw new NullReferenceException($"users not found");
-
-            return allUsers;
-        }
-
         public async Task<ApplicationUser> GetUser(string userEmail)
         {
             ApplicationUser? userById = await userManager.FindByEmailAsync(userEmail);
@@ -94,26 +125,14 @@ namespace Online_Shop.Repository
             return userById;
         }
 
-        public async Task<(int, string)> Login(LoginModel model)
+        public async Task<List<ApplicationUser>> GetAllUser()
         {
-            var user = await userManager.FindByNameAsync(model.Username);
-            if (user == null)
-                return (0, "Invalid username");
-            if (!await userManager.CheckPasswordAsync(user, model.Password))
-                return (0, "Invalid password");
-            var userRoles = await userManager.GetRolesAsync(user);
-            var authClaims = new List<Claim>
-            {
-               new Claim(ClaimTypes.Name, user.UserName),
-               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-            foreach (var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
-            string token = GenerateToken(authClaims);
+            var allUsers = await userManager.Users.ToListAsync();
 
-            return (1, $"Bearer {token}");
+            if (allUsers == null)
+                throw new NullReferenceException($"users not found");
+
+            return allUsers;
         }
 
         public async Task<(int, string)> UpdateUser(RegistrationModel model, string newPassword)
@@ -182,12 +201,34 @@ namespace Online_Shop.Repository
         }
 
 
-        //private string GetRole(string enteredRole) => enteredRole switch
-        //{
-        //    "admin" => UserRoles.Admin,
-        //    "user" => UserRoles.User,
-        //    _ => "invalid"
-        //};
+        private string GetRole(string enteredRole) => enteredRole switch
+        {
+            "admin" => UserRoles.Admin,
+            "user" => UserRoles.User,
+            _ => "invalid"
+        };
+
+        //Tupple pattern
+        private (string, string) GetClaimType_ClaimValue(Roles role) => role switch
+        {
+            Roles.Admin => ("Claim_Admin", "Value_Admin"),
+            Roles.Manager => ("Claim_Manager", "Claim_Manager"),
+            Roles.Member => ("Claim_Member", "Claim_Member"),
+            _ => throw new ArgumentOutOfRangeException(nameof(role), $"Not expected role value: {role}")
+        };
+
     }
 }
+
+public enum Roles
+{
+    [EnumMember(Value = "Admin")]
+    Admin,
+    [EnumMember(Value = "Manager")]
+    Manager,
+    [EnumMember(Value = "Member")]
+    Member
+
+}
+
 

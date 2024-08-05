@@ -12,7 +12,7 @@ namespace Online_Shop.DTOs.ProductDTOs
         [Required]
         public string NewDescription { get; set; } = string.Empty;
         [Required]
-        public int CategoryId;
-        
+        public int CategoryId { get; set; }
+
     }
 }

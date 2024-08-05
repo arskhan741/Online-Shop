@@ -43,17 +43,14 @@ namespace Online_Shop.Controllers
 
         [HttpPost]
         [Route("Registeration")]
-        public async Task<IActionResult> Register(RegistrationModel model, string enteredRole)
+        public async Task<IActionResult> Register(RegistrationModel model, Roles selectedRole)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest("Invalid payload");
 
-
-                enteredRole.ToLower();
-
-                var (status, message) = await _userRepository.CreateUser(model, enteredRole);
+                var (status, message) = await _userRepository.CreateUser(model, selectedRole);
 
 
                 if (status == 0)
