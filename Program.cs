@@ -9,6 +9,7 @@ using Online_Shop.Models;
 using Online_Shop.Repository;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 
 public class Program
@@ -67,10 +68,12 @@ public class Program
         // Add services to the container.
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<IRoleService, RoleRepository>();
-        builder.Services.AddTransient<ICategoryRepository, CategoryReposityory>();
+        builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddTransient<IProductRepository, ProductRepository>();
         builder.Services.AddAutoMapper(typeof(MapperConfig));
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(x => 
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 
         //Register for swagger Controller
@@ -122,6 +125,8 @@ public class Program
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
+
+
 
 
         // Configure the HTTP request pipeline.

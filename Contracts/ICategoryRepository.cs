@@ -11,9 +11,9 @@ namespace Online_Shop.Contracts
 
         Task DeleteAsync(DeleteCategoryDTO deleteCategoryDTO);
 
-        Task<Category> GetAsync(int categoryId);
+        Task<GetCategoryDetailsDto> GetAsync(int categoryId);
 
-        Task<List<Category>> GetAllAsync();
+        Task<IEnumerable<GetCategoryDetailsDto>> GetAllAsync();
 
     }
 }

@@ -6,12 +6,12 @@ using Online_Shop.Models;
 
 namespace Online_Shop.Repository
 {
-    public class CategoryReposityory : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public CategoryReposityory(ApplicationDbContext context, IMapper mapper)
+        public CategoryRepository(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -27,7 +27,7 @@ namespace Online_Shop.Repository
             return category;
         }
 
-        public async Task DeleteAsync(DeleteCategoryDTO deleteCategoryDTO)//
+        public async Task DeleteAsync(DeleteCategoryDTO deleteCategoryDTO)
         {
             Category? category = null;
 
@@ -37,6 +37,7 @@ namespace Online_Shop.Repository
             if (category != null)
             {
                 _context.Categories.Remove(category);
+                await _context.SaveChangesAsync(); // Ensure changes are saved
             }
             else
             {
@@ -44,17 +45,23 @@ namespace Online_Shop.Repository
             }
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<IEnumerable<GetCategoryDetailsDto>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            var categories = await _context.Categories
+                                           .Include(c => c.Products)
+                                           .ToListAsync();
+
+            return _mapper.Map<IEnumerable<GetCategoryDetailsDto>>(categories);
         }
 
-        public async Task<Category> GetAsync(int categoryId)
+        public async Task<GetCategoryDetailsDto> GetAsync(int categoryId)
         {
-            var category = await _context.Categories.FindAsync(categoryId);
+            var category = await _context.Categories
+                                         .Include(c => c.Products)
+                                         .FirstOrDefaultAsync(c => c.Id == categoryId);
 
             if (category != null)
-                return category;
+                return _mapper.Map<GetCategoryDetailsDto>(category);
             else
                 throw new NullReferenceException($"category not found");
         }

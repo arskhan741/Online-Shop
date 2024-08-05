@@ -12,8 +12,8 @@ using Online_Shop.Models;
 namespace Online_Shop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240803224233_category_added")]
-    partial class category_added
+    [Migration("20240804223536_1ToMany")]
+    partial class _1ToMany
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -248,6 +248,32 @@ namespace Online_Shop.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Online_Shop.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Products");
+                });
+
             modelBuilder.Entity("Online_Shop.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -318,6 +344,22 @@ namespace Online_Shop.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Online_Shop.Models.Product", b =>
+                {
+                    b.HasOne("Online_Shop.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Online_Shop.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
