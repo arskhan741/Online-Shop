@@ -217,6 +217,12 @@ namespace Online_Shop.Repository
             _ => throw new ArgumentOutOfRangeException(nameof(role), $"Not expected role value: {role}")
         };
 
+        private List<String> GetAllRolesFromDB()
+        {
+            var roles = roleManager.Roles.Select(x => x.Name).ToList();
+            return roles;
+        }
+
     }
 }
 
@@ -230,5 +236,7 @@ public enum Roles
     Member
 
 }
+
+
 
 
