@@ -53,14 +53,33 @@ public class Program
         //Adding policy to authorization
         builder.Services.AddAuthorization(options =>
         {
+            //Hiearchical role based Policy
             options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
             options.AddPolicy("ManagerPolicy", policy => policy.RequireRole("Admin", "Manager"));
             options.AddPolicy("MemberPolicy", policy => policy.RequireRole("Admin", "Manager", "Member"));
             options.AddPolicy("UserPolicy", policy => policy.RequireRole("Admin", "Manager", "Member", "User"));
-            options.AddPolicy("ClaimsTest1", policy => policy.RequireClaim("Claim1", "Value1"));
+
+            //Over 21 Age Policy
             options.AddPolicy("Over21", policy => policy.RequireAssertion(context =>
                 context.User.HasClaim(c =>
                 c.Type == ClaimTypes.DateOfBirth && DateTime.Parse(c.Value) <= DateTime.Today.AddYears(-21))));
+
+            // Adding Azhar policy
+            options.AddPolicy("Claims_Azhar", policy =>
+                policy.RequireClaim("Claim_Azhar", "Value_Azhar"));
+
+            // Adding role claim policy
+            options.AddPolicy("Claims_Admin", policy =>
+                policy.RequireClaim("Claim_Admin", "Value_Admin"));
+
+            // Combined policy
+            options.AddPolicy("CombinedPolicy", policy =>
+            {
+                policy.RequireAssertion(context =>
+                    context.User.HasClaim(c => c.Type == "Claim_Azhar" && c.Value == "Value_Azhar") &&
+                    context.User.HasClaim(c => c.Type == "Claim_Admin" && c.Value == "Value_Admin"));
+            });
+
         });
 
         // Add services to the container.

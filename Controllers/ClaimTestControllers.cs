@@ -7,15 +7,18 @@ namespace Online_Shop.Controllers
     [Route("api/ClaimTest")]
     public class ClaimTestControllers : ControllerBase
     {
-        [HttpGet("TestClaimsTest1Role")]
-        [Authorize(Policy = "ClaimsTest1")]
-        public IActionResult TestClaimsTest1Role()
+        [HttpGet("TestAdminClaimsRole")]
+        [Authorize(Policy = "Claims_Admin")]
+        public IActionResult TestAdminClaimsRole()
         {
-            return Ok(new { message = "Test ClaimsTest1 API" });
+            return Ok(new { message = "Test AdminClaims API" });
         }
 
-
-
-
+        [HttpGet("TestCombinedPolicy")]
+        [Authorize(Policy = "CombinedPolicy")]
+        public IActionResult TestCombinedPolicy()
+        {
+            return Ok(new { message = "Test Combined Policy API"});
+        }
     }
 }
