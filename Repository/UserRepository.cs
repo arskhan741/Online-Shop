@@ -122,7 +122,6 @@ namespace Online_Shop.Repository
             return (1, $"Bearer {token}");
         }
 
-
         public async Task<(int, string)> DeleteUser(string userEmail)
         {
             ApplicationUser? user = await userManager.FindByEmailAsync(userEmail);
@@ -219,7 +218,6 @@ namespace Online_Shop.Repository
             return tokenHandler.WriteToken(token);
         }
 
-
         private string GetRole(string enteredRole) => enteredRole switch
         {
             "admin" => UserRoles.Admin,
@@ -227,9 +225,9 @@ namespace Online_Shop.Repository
             _ => "invalid"
         };
 
-        //Tupple pattern
         private (string, string) GetRoleClaims(Roles role) => role switch
         {
+        //Tupple pattern
             Roles.Admin => ("Claim_Admin", "Value_Admin"),
             Roles.Manager => ("Claim_Manager", "Claim_Manager"),
             Roles.Member => ("Claim_Member", "Claim_Member"),
