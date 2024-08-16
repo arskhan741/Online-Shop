@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "b437053b-70fe-40dd-9043-634efeff9cb0",
+		"name": "Products",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3531291"
+	},
+	"item": [
+		{
+			"name": "CreateProduct",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"A50\",\r\n  \"description\": \"Samsung mobile device\",\r\n  \"categoryId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/ProductController/CreateProduct",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"ProductController",
+						"CreateProduct"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetProduct",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllProducts",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteProduct",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"productId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/Product/DeleteProduct",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Product",
+						"DeleteProduct"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateProduct",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"productId\": 0,\r\n  \"newName\": null,\r\n  \"newDescription\": null,\r\n  \"categoryId\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/Product/UpdateProduct",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Product",
+						"UpdateProduct"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

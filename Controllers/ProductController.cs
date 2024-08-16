@@ -5,7 +5,7 @@ using Online_Shop.DTOs.ProductDTOs;
 namespace Online_Shop.Controllers
 {
     [ApiController]
-    [Route("api/ProductController")]
+    [Route("Product")]
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -28,7 +28,8 @@ namespace Online_Shop.Controllers
             return Ok(product);
         }
 
-        [HttpGet("GetProduct")]
+        [HttpGet]
+        [Route("GetProduct/{productId:int}")]
         public async Task<IActionResult> GetProduct(int productId)
         {
             if (!ModelState.IsValid)

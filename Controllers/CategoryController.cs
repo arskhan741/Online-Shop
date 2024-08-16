@@ -5,7 +5,7 @@ using Online_Shop.DTOs.CategoryDTOs;
 namespace Online_Shop.Controllers
 {
     [ApiController]
-    [Route("api/CategoryControllers")]
+    [Route("Category")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -29,7 +29,8 @@ namespace Online_Shop.Controllers
             return Ok(Category);
         }
 
-        [HttpGet("GetCategory")]
+        [HttpGet]
+        [Route("GetCategory/{categoryId:int}")]
         public async Task<IActionResult> GetCategory(int categoryId)
         {
             if (!ModelState.IsValid)
@@ -58,7 +59,7 @@ namespace Online_Shop.Controllers
 
             await _categoryRepository.DeleteAsync(deleteCategoryDTO);
 
-            return Ok(new { message = $"Category with id:{deleteCategoryDTO.CategoryId} deleted" });
+            return Ok(new { message = $"Category with id: {deleteCategoryDTO.CategoryId} is deleted" });
         }
 
         [HttpPut("UpdateCategory")]

@@ -1,0 +1,128 @@
+{
+	"info": {
+		"_postman_id": "ab5cde96-eab3-43c0-b128-4ba4cd923521",
+		"name": "Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3531291"
+	},
+	"item": [
+		{
+			"name": "GetAllCategory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7149/Category/GetAllCategory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Category",
+						"GetAllCategory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateCategory",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Name\": \"Apple\",\r\n    \"Description\" : \"All Apple Devices\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/Category/CreateCategory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Category",
+						"CreateCategory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCategory",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"categoryId\" : 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/Category/GetCategory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Category",
+						"GetCategory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteCategory",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"categoryId\": 0,\r\n  \"categoryName\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7149/Category/DeleteCategory",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7149",
+					"path": [
+						"Category",
+						"DeleteCategory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateCategory",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
