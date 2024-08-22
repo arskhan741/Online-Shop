@@ -19,7 +19,13 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         //For DB connection
-        builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+        //builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+
+        // For PG connection
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("PGConn")));
+
+
 
         // For Identity  
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

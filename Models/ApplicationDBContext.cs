@@ -26,11 +26,14 @@ namespace Online_Shop.Models
         {
             base.OnModelCreating(modelBuilder);
 
+
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Products)
                 .WithOne(p => p.Category)
                 .HasForeignKey(p => p.CategoryId);
         }
+
+
 
     }
 }
