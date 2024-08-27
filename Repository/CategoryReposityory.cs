@@ -19,9 +19,12 @@ namespace Online_Shop.Repository
 
         public async Task<Category?> CreateAsync(CreateCategoryDTO createCategoryDTO)
         {
-            Category category = _mapper.Map<Category>(createCategoryDTO);
+			Category category = _mapper.Map<Category>(createCategoryDTO);
 
-            await _context.AddAsync(category);
+            category.CreatedOn = DateTime.UtcNow;
+            category.UpdatedOn = DateTime.UtcNow;
+
+			await _context.AddAsync(category);
             await _context.SaveChangesAsync();
 
             return category;
@@ -77,8 +80,9 @@ namespace Online_Shop.Repository
 
             category.Name = updateCategoryDTO.NewName;
             category.Description = updateCategoryDTO.NewDescription;
+			category.UpdatedOn = DateTime.UtcNow;
 
-            _context.Categories.Update(category);
+			_context.Categories.Update(category);
             await _context.SaveChangesAsync();
 
             return category;

@@ -26,7 +26,10 @@ namespace Online_Shop.Repository
         {
             Product product = _mapper.Map<Product>(createProductDTO);
 
-            await _context.AddAsync(product);
+			product.CreatedOn = DateTime.UtcNow;
+			product.UpdatedOn = DateTime.UtcNow;
+
+			await _context.AddAsync(product);
             await _context.SaveChangesAsync();
 
             InvalidateCache();
@@ -107,6 +110,11 @@ namespace Online_Shop.Repository
             product.Name = updateProductDTO.NewName;
             product.Description = updateProductDTO.NewDescription;
             product.CategoryId = updateProductDTO.CategoryId;
+            product.UpdatedOn = DateTime.UtcNow;
+            product.Price = updateProductDTO.NewPrice;
+            product.Stock = updateProductDTO.NewStock;
+            product.IsFeatured = updateProductDTO.IsFeatured;
+            product.Rating = updateProductDTO.NewRating;
 
             //_mapper.Map(product, updateProductDTO);
 

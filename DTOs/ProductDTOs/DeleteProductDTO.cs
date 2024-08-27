@@ -1,7 +1,10 @@
-﻿namespace Online_Shop.DTOs.ProductDTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Online_Shop.DTOs.ProductDTOs
 {
     public class DeleteProductDTO
     {
-        public int ProductId { get; set; }
-    }
+		[Required]
+		public int ProductId { get; set; }
+	}
 }
